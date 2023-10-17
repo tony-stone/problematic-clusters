@@ -81,5 +81,5 @@ digraph Dataflow {
 ## Slide 5: Size text to fit
 
 ::: {.r-fit-text}
-__WRITE A README__
+text to fit
 :::
