@@ -6,6 +6,11 @@ Remember to create an empty `gh-pages` branch:
 ```
 git switch --orphan gh-pages
 git commit --allow-empty -m "Initial commit on gh-pages branch"
-git push -u origin gh-pages
+git push -u upstream gh-pages
 git switch main
+```
+
+To create a remote (upstream) repo from a local copy:
+```
+gh repo create --public --source=. --remote=upstream --push
 ```
