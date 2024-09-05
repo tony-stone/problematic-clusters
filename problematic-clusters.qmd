@@ -156,7 +156,7 @@ having either:
 1. No false positive links
 1. One or more false positive links.
 
-## Data
+## Data {.smaller}
 
 * Wikidata comprised data belonging to individuals 
 * Date of death between the years 1953 and 2000 (inclusive). 
