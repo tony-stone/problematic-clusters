@@ -338,135 +338,71 @@ Tony Stone
 
   <p class="date">5 Sep 2024</p>
 </section>
-<section id="slide-title-1" class="slide level2 smaller">
-<h2>Slide Title 1</h2>
-<p>A <a href="https://www.github.com/UCL-ECHILD">link</a></p>
-<center>
-Centre something
-</center>
-<ol type="1">
-<li>numbered list item 1
-<ol type="1">
-<li>numbered sublist item 1</li>
-</ol></li>
-</ol>
+<section id="context" class="slide level2">
+<h2>Context</h2>
 <ul>
-<li>list item 1
-<ul>
-<li>sublist item 1</li>
-</ul></li>
+<li><p>Manual review of record linkage outputs is resource intensive</p></li>
+<li><p>Aim: Reduce manual review by automated identification of false links / missed links</p></li>
 </ul>
-<aside class="notes">
-<p>Slide notes</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
-<section id="slide-2-background-colour" class="slide level2" data-background-color="#e3fdf6">
-<h2>Slide 2 background colour</h2>
+<section id="entity-resolution" class="slide level2">
+<h2>Entity resolution</h2>
 <blockquote>
-<p>A quote</p>
-<p>–<em>(with attribution)<sup>1</sup></em></p>
+<p>The process of identifying records belonging to the same individual (or entity) from a set or sets of textual records.</p>
 </blockquote>
-<aside><ol class="aside-footnotes"><li id="fn1"><p>And a footnote.</p></li></ol></aside></section>
-<section id="slide-3-columns" class="slide level2">
-<h2>Slide 3: columns</h2>
-<div class="columns">
-<div class="column" style="width:75%;">
-<p><strong>Emphasised text in left column</strong></p>
-</div><div class="column" style="width:25%;">
-<p><em>Italicised text in right column</em></p>
-</div></div>
+<ul>
+<li><p>Also known as de-duplication</p></li>
+<li><p>Considerably harder than 1-to-1 linkage</p></li>
+</ul>
 </section>
-<section id="slide-4-a-graph" class="slide level2">
-<h2>Slide 4: a graph</h2>
-<div class="cell" data-fig-width="2" data-layout-align="default">
+<section id="definitions-for-this-presentation-12" class="slide level2 smaller">
+<h2>Definitions for this presentation (1/2)</h2>
+<ul>
+<li><p><strong>record linkage:</strong> probabilistic pairwise-comparison linkage approach (Fellegi-Sunter) followed by <em>transitive closure</em> to produce disjoint <em>clusters</em>.</p></li>
+<li><p><strong>transitive closure:</strong></p></li>
+</ul>
+<div class="cell" data-fig-height="2" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<svg width="192" height="480" viewbox="0.00 0.00 111.19 316.93" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 312.93)">
-<title>Dataflow</title>
-<!-- input -->
+<svg width="960" height="192" viewbox="0.00 0.00 134.21 106.41" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102.41)">
+<title>G</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-102.41 130.21,-102.41 130.21,4 -4,4"></polygon>
+<!-- A -->
 <g id="node1" class="node">
-<title>input</title>
-<ellipse fill="lightgreen" stroke="black" cx="31.19" cy="-279.65" rx="29.05" ry="29.05"></ellipse>
-<text text-anchor="middle" x="31.19" y="-275.45" font-family="Times,serif" font-size="14.00">Start</text>
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-79.93" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="27" y="-75.73" font-family="Times,serif" font-size="14.00">A</text>
 </g>
-<!-- d -->
+<!-- B -->
 <g id="node2" class="node">
-<title>d</title>
-<ellipse fill="lightblue" stroke="black" cx="35.19" cy="-35.19" rx="35.38" ry="35.38"></ellipse>
-<text text-anchor="middle" x="35.19" y="-30.99" font-family="Times,serif" font-size="14.00">Finish</text>
+<title>B</title>
+<ellipse fill="none" stroke="black" cx="99.21" cy="-80.41" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="99.21" y="-76.21" font-family="Times,serif" font-size="14.00">B</text>
 </g>
-<!-- input&#45;&gt;d -->
+<!-- A&#45;&#45;B -->
 <g id="edge1" class="edge">
-<title>input-&gt;d</title>
-<path fill="none" stroke="black" d="M17.86,-253.44C12.47,-241.88 6.89,-227.78 4.19,-214.38 0.17,-194.46 6.37,-114.85 8.19,-106.38 10.28,-96.62 13.53,-86.43 17.06,-76.94"></path>
-<polygon fill="black" stroke="black" points="20.43,-77.93 20.81,-67.34 13.91,-75.39 20.43,-77.93"></polygon>
+<title>A--B</title>
+<path fill="none" stroke="black" d="M54.3,-80.11C60.05,-80.15 66.12,-80.19 71.87,-80.23"></path>
 </g>
-<!-- a -->
+<!-- C -->
 <g id="node3" class="node">
-<title>a</title>
-<ellipse fill="Linen" stroke="black" cx="31.19" cy="-196.38" rx="18" ry="18"></ellipse>
-<text text-anchor="middle" x="31.19" y="-192.18" font-family="Times,serif" font-size="14.00">a</text>
+<title>C</title>
+<ellipse fill="none" stroke="black" cx="63.59" cy="-18" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="63.59" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
 </g>
-<!-- input&#45;&gt;a -->
-<g id="edge2" class="edge">
-<title>input-&gt;a</title>
-<path fill="none" stroke="black" d="M31.19,-250.23C31.19,-241.95 31.19,-232.93 31.19,-224.72"></path>
-<polygon fill="black" stroke="black" points="34.69,-224.53 31.19,-214.53 27.69,-224.53 34.69,-224.53"></polygon>
-</g>
-<!-- b -->
-<g id="node4" class="node">
-<title>b</title>
-<ellipse fill="Linen" stroke="black" cx="85.19" cy="-196.38" rx="18" ry="18"></ellipse>
-<text text-anchor="middle" x="85.19" y="-192.18" font-family="Times,serif" font-size="14.00">b</text>
-</g>
-<!-- input&#45;&gt;b -->
+<!-- A&#45;&#45;C -->
 <g id="edge3" class="edge">
-<title>input-&gt;b</title>
-<path fill="none" stroke="black" d="M47.1,-254.71C54.29,-243.88 62.76,-231.14 69.88,-220.42"></path>
-<polygon fill="black" stroke="black" points="72.87,-222.24 75.49,-211.98 67.04,-218.37 72.87,-222.24"></polygon>
+<title>A--C</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M37,-63.01C42.16,-54.27 48.44,-43.64 53.61,-34.9"></path>
+<text text-anchor="middle" x="39.09" y="-36.36" font-family="Times,serif" font-size="14.00">??</text>
 </g>
-<!-- c -->
-<g id="node5" class="node">
-<title>c</title>
-<ellipse fill="Linen" stroke="black" cx="35.19" cy="-124.38" rx="18" ry="18"></ellipse>
-<text text-anchor="middle" x="35.19" y="-120.18" font-family="Times,serif" font-size="14.00">c</text>
-</g>
-<!-- a&#45;&gt;c -->
-<g id="edge4" class="edge">
-<title>a-&gt;c</title>
-<path fill="none" stroke="black" d="M32.18,-178.07C32.62,-170.36 33.15,-161.09 33.64,-152.49"></path>
-<polygon fill="black" stroke="black" points="37.13,-152.66 34.21,-142.48 30.15,-152.26 37.13,-152.66"></polygon>
-</g>
-<!-- b&#45;&gt;d -->
-<g id="edge6" class="edge">
-<title>b-&gt;d</title>
-<path fill="none" stroke="black" d="M81.43,-178.48C77.28,-160.46 70.13,-131.15 62.19,-106.38 59.17,-96.96 55.58,-86.98 52.01,-77.59"></path>
-<polygon fill="black" stroke="black" points="55.2,-76.13 48.33,-68.06 48.67,-78.65 55.2,-76.13"></polygon>
-</g>
-<!-- b&#45;&gt;c -->
-<g id="edge5" class="edge">
-<title>b-&gt;c</title>
-<path fill="none" stroke="black" d="M75.07,-181.21C68.23,-171.63 59.04,-158.77 51.21,-147.81"></path>
-<polygon fill="black" stroke="black" points="53.95,-145.62 45.29,-139.52 48.26,-149.69 53.95,-145.62"></polygon>
-</g>
-<!-- c&#45;&gt;d -->
-<g id="edge7" class="edge">
-<title>c-&gt;d</title>
-<path fill="none" stroke="black" d="M35.19,-106.15C35.19,-98.8 35.19,-89.84 35.19,-80.82"></path>
-<polygon fill="black" stroke="black" points="38.69,-80.69 35.19,-70.69 31.69,-80.69 38.69,-80.69"></polygon>
+<!-- B&#45;&#45;C -->
+<g id="edge2" class="edge">
+<title>B--C</title>
+<path fill="none" stroke="black" d="M89.47,-63.35C84.45,-54.55 78.34,-43.84 73.31,-35.03"></path>
 </g>
 </g>
 </svg>
@@ -475,19 +411,233 @@ Centre something
 </div>
 </div>
 </div>
+<ul>
+<li><strong>cluster:</strong> a set of records connected (possibly via <em>transitive closure</em>) through one or more pairwise comparisons, each with <em>match score</em> exceeding a chosen (linkage) threshold. (And not connected to any record outside the set.)</li>
+</ul>
 </section>
-<section id="slide-5-size-text-to-fit" class="slide level2">
-<h2>Slide 5: Size text to fit</h2>
-<div class="r-fit-text">
-<p>text to fit</p>
+<section id="definitions-for-this-presentation-22" class="slide level2 smaller">
+<h2>Definitions for this presentation (2/2)</h2>
+<ul>
+<li><p><strong>“problematic cluster”:</strong> a cluster with one or more false positive</p></li>
+<li><p><strong>match score:</strong> The ratio of the products of conditional probabilities of each compared attribute in two records being un/equal, given the records are a true match (<span class="math inline">\(M\)</span>) over true non-matches (<span class="math inline">\(U\)</span>).</p></li>
+</ul>
+<p><span class="math display">\[ R_i = \frac{P(\gamma_i \mid M)}{P(\gamma_i \mid U)} =
+  \frac{\prod_j P(\gamma_{ij} \mid M)}{\prod_j P(\gamma_{ij} \mid U)}
+\]</span></p>
+<p><em>We assume conditional independence amongst compared attributes.</em></p>
+</section>
+<section id="graph-representation-of-pairwise-record-linkage-outputs" class="slide level2">
+<h2>Graph representation of pairwise record linkage outputs</h2>
+<p>Each cluster can be represented as an:</p>
+<ul>
+<li>undirected simple graph, with:
+<ul>
+<li>each vertex representing a record</li>
+<li>each edge representing a comparison of records</li>
+</ul></li>
+</ul>
+</section>
+<section id="graph-conceptualisations" class="slide level2 smaller">
+<h2>Graph conceptualisations</h2>
+<ol type="1">
+<li>Single match score threshold: graph only includes edges representing pairwise comparisons that had a match score greater than the threshold.</li>
+<li>Include match scores (suitably transformed [0,1]) as a weight for each edge.</li>
+<li>In addition to overall match score, include the contribution (suitably transformed [0,1]) of each compared attribute to the overall match score as a vector edge weights.</li>
+</ol>
+<div class="columns">
+<div class="column" style="width:30%;">
+<div class="cell" data-fig-height="2" data-fig-width="2" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<svg width="192" height="192" viewbox="0.00 0.00 130.13 169.48" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 165.48)">
+<title>G1</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-165.48 126.13,-165.48 126.13,4 -4,4"></polygon>
+<!-- A -->
+<g id="node1" class="node">
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-143.48" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="27" y="-139.28" font-family="Times,serif" font-size="14.00">A</text>
+</g>
+<!-- B -->
+<g id="node2" class="node">
+<title>B</title>
+<ellipse fill="none" stroke="black" cx="71.02" cy="-86.15" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="71.02" y="-81.95" font-family="Times,serif" font-size="14.00">B</text>
+</g>
+<!-- A&#45;&#45;B -->
+<g id="edge1" class="edge">
+<title>A--B</title>
+<path fill="none" stroke="black" d="M39.5,-127.2C45.5,-119.39 52.66,-110.06 58.64,-102.27"></path>
+</g>
+<!-- C -->
+<g id="node3" class="node">
+<title>C</title>
+<ellipse fill="none" stroke="black" cx="95.13" cy="-18" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="95.13" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
+</g>
+<!-- B&#45;&#45;C -->
+<g id="edge2" class="edge">
+<title>B--C</title>
+<path fill="none" stroke="black" d="M77.23,-68.6C80.8,-58.51 85.27,-45.86 88.85,-35.73"></path>
+</g>
+</g>
+</svg>
 </div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:30%;">
+<div class="cell" data-fig-height="2" data-fig-width="2" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<svg width="192" height="192" viewbox="0.00 0.00 134.21 106.41" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102.41)">
+<title>G2</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-102.41 130.21,-102.41 130.21,4 -4,4"></polygon>
+<!-- A -->
+<g id="node1" class="node">
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-79.93" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="27" y="-75.73" font-family="Times,serif" font-size="14.00">A</text>
+</g>
+<!-- B -->
+<g id="node2" class="node">
+<title>B</title>
+<ellipse fill="none" stroke="black" cx="99.21" cy="-80.41" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="99.21" y="-76.21" font-family="Times,serif" font-size="14.00">B</text>
+</g>
+<!-- A&#45;&#45;B -->
+<g id="edge1" class="edge">
+<title>A--B</title>
+<path fill="none" stroke="black" d="M54.3,-80.11C60.05,-80.15 66.12,-80.19 71.87,-80.23"></path>
+<text text-anchor="middle" x="63.08" y="-67.57" font-family="Times,serif" font-size="14.00">0.5</text>
+</g>
+<!-- C -->
+<g id="node3" class="node">
+<title>C</title>
+<ellipse fill="none" stroke="black" cx="63.59" cy="-18" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="63.59" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
+</g>
+<!-- A&#45;&#45;C -->
+<g id="edge3" class="edge">
+<title>A--C</title>
+<path fill="none" stroke="black" d="M37,-63.01C42.16,-54.27 48.44,-43.64 53.61,-34.9"></path>
+<text text-anchor="middle" x="36.55" y="-36.36" font-family="Times,serif" font-size="14.00">0.3</text>
+</g>
+<!-- B&#45;&#45;C -->
+<g id="edge2" class="edge">
+<title>B--C</title>
+<path fill="none" stroke="black" d="M89.47,-63.35C84.45,-54.55 78.34,-43.84 73.31,-35.03"></path>
+<text text-anchor="middle" x="90.14" y="-36.59" font-family="Times,serif" font-size="14.00">0.9</text>
+</g>
+</g>
+</svg>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:30%;">
+<div class="cell" data-fig-height="2" data-fig-width="2" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<svg width="192" height="192" viewbox="0.00 0.00 195.74 106.41" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102.41)">
+<title>G3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-102.41 191.74,-102.41 191.74,4 -4,4"></polygon>
+<!-- A -->
+<g id="node1" class="node">
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="57.52" cy="-79.93" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="57.52" y="-75.73" font-family="Times,serif" font-size="14.00">A</text>
+</g>
+<!-- B -->
+<g id="node2" class="node">
+<title>B</title>
+<ellipse fill="none" stroke="black" cx="129.73" cy="-80.41" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="129.73" y="-76.21" font-family="Times,serif" font-size="14.00">B</text>
+</g>
+<!-- A&#45;&#45;B -->
+<g id="edge1" class="edge">
+<title>A--B</title>
+<path fill="none" stroke="black" d="M84.82,-80.11C90.57,-80.15 96.64,-80.19 102.39,-80.23"></path>
+<text text-anchor="middle" x="55.69" y="-84.37" font-family="Times,serif" font-size="14.00">(0.5, 0.6, 0.8)</text>
+</g>
+<!-- C -->
+<g id="node3" class="node">
+<title>C</title>
+<ellipse fill="none" stroke="black" cx="94.11" cy="-18" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="94.11" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
+</g>
+<!-- A&#45;&#45;C -->
+<g id="edge3" class="edge">
+<title>A--C</title>
+<path fill="none" stroke="black" d="M67.52,-63.01C72.68,-54.27 78.97,-43.64 84.13,-34.9"></path>
+<text text-anchor="middle" x="37.91" y="-36.36" font-family="Times,serif" font-size="14.00">(0.1, 0.2, 0.2)</text>
+</g>
+<!-- B&#45;&#45;C -->
+<g id="edge2" class="edge">
+<title>B--C</title>
+<path fill="none" stroke="black" d="M120,-63.35C114.97,-54.55 108.86,-43.84 103.83,-35.03"></path>
+<text text-anchor="middle" x="149.83" y="-36.59" font-family="Times,serif" font-size="14.00">(0.2, 0.3, 0.4)</text>
+</g>
+</g>
+</svg>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="graphs-measures-investigated" class="slide level2">
+<h2>Graphs measures investigated</h2>
+<ul>
+<li>Diameter: an indication of the connectedness of vertices in a graph Global Clustering Coefficient</li>
+<li>Global clustering coefficient: a measure of the clustering of the vertices</li>
+<li>Averaged Local Clustering Coefficient: another measure of clustering of the vertices</li>
+<li>Assortativity (degree): can be interpreted as a measure summarising how vertices in a graph mix together</li>
+<li>Density: the connectedness of vertices in a graph</li>
+</ul>
+</section>
+<section id="a-classification-problem" class="slide level2">
+<h2>A classification problem</h2>
+<p>Can a widely-applicable classifier be created to identify false positive links using only graph measures derived from the outputs of a record linkage process.</p>
+<p>In essence, this is a binary classification problem in which the individual units are the clusters (of three or more records), with features comprised of various graph measures, and we wish to classify each unit as having either:</p>
+<ol type="1">
+<li>No false positive links</li>
+<li>One or more false positive links.</li>
+</ol>
+</section>
+<section id="data" class="slide level2">
+<h2>Data</h2>
+<ul>
+<li><p>Wikidata comprised data belonging to individuals</p></li>
+<li><p>Date of death between the years 1953 and 2000 (inclusive).</p></li>
+<li><p>Given name</p></li>
+<li><p>Family name</p></li>
+<li><p>Date of birth (day component)</p></li>
+<li><p>Date of birth (month component)</p></li>
+<li><p>Date of birth (year component)</p></li>
+<li><p>Gender</p></li>
+<li><p>311,915</p></li>
+<li><p>5 fields</p></li>
+<li><p>no missing values</p></li>
+</ul>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
 </section>
-
     </div>
   </div>
 
