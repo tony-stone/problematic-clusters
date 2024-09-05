@@ -1,13 +1,11 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle"
+title: "Identifying \"problematic\" record linkage clusters using graph measures"
 author: "Tony Stone"
-date: 2023-09-21
+date: 2024-09-05
 date-format: "D MMM YYYY"
 format: 
   revealjs:
-    logo: imgs/logo.png
-    theme: solarized
+    theme: simple
 ---
 
 ## Slide Title 1 {.smaller}
