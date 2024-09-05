@@ -8,76 +8,167 @@ format:
     theme: simple
 ---
 
-## Slide Title 1 {.smaller}
+## Context
 
+* Manual review of record linkage outputs is resource intensive
 
-A [link](https://www.github.com/UCL-ECHILD)
+* Aim: Reduce manual review by automated identification of false links / missed 
+links
 
-<center>Centre something</center>
+## Entity resolution
 
-1. numbered list item 1
-    1. numbered sublist item 1
-    
-* list item 1
-    * sublist item 1
+> The process of identifying records belonging to the same individual (or entity) 
+> from a set or sets of textual records.
 
-::: {.notes}
-Slide notes
-:::
+* Also known as de-duplication
 
+* Considerably harder than 1-to-1 linkage
 
-## Slide 2 background colour {background-color="#e3fdf6"}
+## Definitions for this presentation (1/2) {.smaller}
 
-
-> A quote
-> 
-> --_(with attribution)^[And a footnote.]_
-
-
-## Slide 3: columns
-
-:::: {.columns}
-::: {.column width="75%"}
-
-__Emphasised text in left column__
-
-:::
-
-::: {.column width="25%"}
-
-_Italicised text in right column_
-
-:::
-::::
-
-## Slide 4: a graph
-
+* **record linkage:** probabilistic pairwise-comparison linkage approach 
+  (Fellegi-Sunter) followed by *transitive closure* to produce disjoint 
+  *clusters*.
+  
+* **transitive closure:**   
 ```{dot}
-//| fig-width: 2
+//| fig-height: 2
 
-digraph Dataflow {
-  rankdir="TB";
-	labelloc = t;
-	fontname = "Helvetica,Arial,sans-serif";
-	bgcolor = "transparent";
-  node [shape = circle, style = filled, fillcolor = Linen];
-  input [label = "Start", fillcolor = lightgreen];
-  d [label = "Finish", fillcolor = lightblue];
-  a [label = "a"]
-  b [label = "b"]
-  c [label = "c"]
-
-  input -> {a b d}
-  {a b} -> c
-  b -> d
-  c -> d
-
+graph G {
+layout=neato
+A -- B;
+B -- C;
+edge [style=dashed];
+A -- C [label = "??"];
 }
 
 ```
 
-## Slide 5: Size text to fit
+* **cluster:** a set of records connected (possibly via *transitive closure*) 
+  through one or more pairwise comparisons, each with *match score* exceeding a 
+  chosen (linkage) threshold. (And not connected to any record outside the set.)
 
-::: {.r-fit-text}
-text to fit
+## Definitions for this presentation (2/2) {.smaller}
+  
+* **"problematic cluster":** a cluster with one or more false positive 
+
+* **match score:** The ratio of the products of conditional probabilities of each 
+compared attribute in two records being un/equal, given the records are a true 
+match ($M$) over true non-matches ($U$).
+
+$$ R_i = \frac{P(\gamma_i \mid M)}{P(\gamma_i \mid U)} = 
+  \frac{\prod_j P(\gamma_{ij} \mid M)}{\prod_j P(\gamma_{ij} \mid U)}
+$$
+
+*We assume conditional independence amongst compared attributes.*
+
+
+## Graph representation of pairwise record linkage outputs
+
+Each cluster can be represented as an:
+
+* undirected simple graph, with:
+    * each vertex representing a record
+    * each edge representing a comparison of records
+
+## Graph conceptualisations {.smaller}
+
+1. Single match score threshold: graph only includes edges representing pairwise 
+  comparisons that had a match score greater than the threshold.
+1. Include match scores (suitably transformed [0,1]) as a weight for each edge.
+1. In addition to overall match score, include the contribution (suitably 
+  transformed [0,1]) of each compared attribute to the overall match 
+  score as a vector edge weights.
+  
+  
+:::: {.columns}
+::: {.column width="30%"}
+
+```{dot}
+//| fig-height: 2
+//| fig-width: 2
+
+graph G1 {
+layout=neato
+A -- B;
+B -- C;
+}
+
+```
+
 :::
+
+::: {.column width="30%"}
+
+```{dot}
+//| fig-height: 2
+//| fig-width: 2
+
+graph G2 {
+layout=neato
+A -- B [label = "0.5"];
+B -- C [label = "0.9"];
+A -- C [label = "0.3"];
+}
+
+```
+
+:::
+
+::: {.column width="30%"}
+
+```{dot}
+//| fig-height: 2
+//| fig-width: 2
+
+graph G3 {
+layout=neato
+A -- B [label = "(0.5, 0.6, 0.8)"];
+B -- C [label = "(0.2, 0.3, 0.4)"];
+A -- C [label = "(0.1, 0.2, 0.2)"];
+}
+
+```
+
+:::
+::::
+
+
+## Graphs measures investigated
+
+* Diameter: an indication of the connectedness of vertices in a graph Global Clustering Coefficient
+* Global clustering coefficient: a measure of the clustering of the vertices
+* Averaged Local Clustering Coefficient: another measure of clustering of the vertices
+* Assortativity (degree): can be interpreted as a measure summarising how vertices 
+in a graph mix together
+* Density: the connectedness of vertices in a graph
+
+## A classification problem
+
+Can a widely-applicable classifier be created to identify false positive links 
+using only graph measures derived from the outputs of a record linkage process.
+
+In essence, this is a binary classification problem in which the 
+individual units are the clusters (of three or more records), with features 
+comprised of various graph measures, and we wish to classify each unit as 
+having either:
+
+1. No false positive links
+1. One or more false positive links.
+
+## Data
+
+* Wikidata comprised data belonging to individuals 
+* Date of death between the years 1953 and 2000 (inclusive). 
+
+* Given name
+* Family name
+* Date of birth (day component)
+* Date of birth (month component)
+* Date of birth (year component)
+* Gender
+
+* 311,915
+* 5 fields
+* no missing values
+
