@@ -3,32 +3,44 @@ title: "Identifying \"problematic\" record linkage clusters using graph measures
 author: "Tony Stone"
 date: 2024-09-05
 date-format: "D MMM YYYY"
+css: style.css
 format: 
   revealjs:
     theme: simple
+    width: 1600
+    height: 900
 ---
+
+```{r}
+
+library(data.table)
+library(ggplot2)
+
+load("plot_data.rda")
+
+```
 
 ## Context
 
-* Manual review of record linkage outputs is resource intensive
-
-* Aim: Reduce manual review by automated identification of false links / missed 
-links
-
-## Entity resolution
+#### Record linkage
 
 > The process of identifying records belonging to the same individual (or entity) 
 > from a set or sets of textual records.
 
-* Also known as de-duplication
+* Also known as entity resolution / de-duplication
 
-* Considerably harder than 1-to-1 linkage
+* Often involves *manual review* to identify false links / missed links
 
-## Definitions for this presentation (1/2) {.smaller}
+#### Wider aims
 
-* **record linkage:** probabilistic pairwise-comparison linkage approach 
-  (Fellegi-Sunter) followed by *transitive closure* to produce disjoint 
-  *clusters*.
+* Desire to reduce (resource intensive) manual review: 
+    * automate identification of **false links** / ~~missed links~~
+
+
+## Definitions for this presentation (1/2)
+
+* **record linkage:** pairwise comparison of records 
+$\rightarrow$ *transitive closure* $\rightarrow$ *clusters*
   
 * **transitive closure:**   
 ```{dot}
@@ -44,17 +56,16 @@ A -- C [label = "??"];
 
 ```
 
-* **cluster:** a set of records connected (possibly via *transitive closure*) 
-  through one or more pairwise comparisons, each with *match score* exceeding a 
-  chosen (linkage) threshold. (And not connected to any record outside the set.)
+* **cluster:** set of records connected by comparisons yielding *match score* 
+  above a linkage threshold.
 
-## Definitions for this presentation (2/2) {.smaller}
+## Definitions for this presentation (2/2)
   
-* **"problematic cluster":** a cluster with one or more false positive 
+* **"problematic" cluster:** a cluster with one or more false positive links
 
-* **match score:** The ratio of the products of conditional probabilities of each 
-compared attribute in two records being un/equal, given the records are a true 
-match ($M$) over true non-matches ($U$).
+* **match score:** Ratio of products of conditional probabilities of observing 
+  in/equality of an attribute in two records given true 
+  matches ($M$) over true non-matches ($U$).
 
 $$ R_i = \frac{P(\gamma_i \mid M)}{P(\gamma_i \mid U)} = 
   \frac{\prod_j P(\gamma_{ij} \mid M)}{\prod_j P(\gamma_{ij} \mid U)}
@@ -65,31 +76,47 @@ $$
 
 ## Graph representation of pairwise record linkage outputs
 
-Each cluster can be represented as an:
+Each cluster an undirected simple graph, where:
 
-* undirected simple graph, with:
-    * each vertex representing a record
-    * each edge representing a comparison of records
+* vertices $\leftrightarrow$ records
+* edges $\leftrightarrow$ comparison of records
 
-## Graph conceptualisations {.smaller}
-
-1. Single match score threshold: graph only includes edges representing pairwise 
-  comparisons that had a match score greater than the threshold.
-1. Include match scores (suitably transformed [0,1]) as a weight for each edge.
-1. In addition to overall match score, include the contribution (suitably 
-  transformed [0,1]) of each compared attribute to the overall match 
-  score as a vector edge weights.
-  
-  
-:::: {.columns}
-::: {.column width="30%"}
-
+    
 ```{dot}
-//| fig-height: 2
-//| fig-width: 2
+//| fig-height: 5
+//| fig-width: 7
+
+graph G {
+bgcolor="transparent"
+
+A [label = "Record 1"]
+B [label = "Record 2"]
+A -- B [label = " Comparison of Records 1 & 2"]
+}
+
+```
+
+## Graph conceptualisations
+
+1. No weighted graph measures
+1. Weighted graph: match score (above linkage threshold)
+1. Multiple weighted graphs:
+    * match score
+    * each compared attributes' contribution
+  
+
+<div style="clear: both;"></div>
+
+:::: {.columns}
+::: {.column .orange width="30%"}
+1.
+```{dot}
+//| fig-height: 2.5
+//| fig-width: 3
 
 graph G1 {
 layout=neato
+bgcolor="transparent"
 A -- B;
 B -- C;
 }
@@ -98,34 +125,34 @@ B -- C;
 
 :::
 
-::: {.column width="30%"}
-
+::: {.column .green width="30%"}
+2.
 ```{dot}
-//| fig-height: 2
-//| fig-width: 2
+//| fig-height: 2.5
+//| fig-width: 3
 
 graph G2 {
 layout=neato
+bgcolor="transparent"
 A -- B [label = "0.5"];
 B -- C [label = "0.9"];
-A -- C [label = "0.3"];
 }
 
 ```
 
 :::
 
-::: {.column width="30%"}
-
+::: {.column .purple width="30%"}
+3.
 ```{dot}
-//| fig-height: 2
-//| fig-width: 2
+//| fig-height: 2.5
+//| fig-width: 3
 
 graph G3 {
 layout=neato
-A -- B [label = "(0.5, 0.6, 0.8)"];
-B -- C [label = "(0.2, 0.3, 0.4)"];
-A -- C [label = "(0.1, 0.2, 0.2)"];
+bgcolor="transparent"
+A -- B [label = "(0.5, 0.6, 0.4)"];
+B -- C [label = "(0.9, 0.9, 0.8)"];
 }
 
 ```
@@ -136,39 +163,245 @@ A -- C [label = "(0.1, 0.2, 0.2)"];
 
 ## Graphs measures investigated
 
-* Diameter: an indication of the connectedness of vertices in a graph Global Clustering Coefficient
-* Global clustering coefficient: a measure of the clustering of the vertices
-* Averaged Local Clustering Coefficient: another measure of clustering of the vertices
-* Assortativity (degree): can be interpreted as a measure summarising how vertices 
-in a graph mix together
-* Density: the connectedness of vertices in a graph
+* **5 measures:** Diameter; Global clustering coefficient; 
+  Averaged Local Clustering Coefficient; Assortativity (degree); Density
+* **Measures of vertex:** connectedness, clustering, mixing
+* Weights only used for **diameter**
 
-## A classification problem
 
-Can a widely-applicable classifier be created to identify false positive links 
-using only graph measures derived from the outputs of a record linkage process.
+## A binary classification problem
 
-In essence, this is a binary classification problem in which the 
-individual units are the clusters (of three or more records), with features 
-comprised of various graph measures, and we wish to classify each unit as 
-having either:
+Identify clusters with false positive links
 
-1. No false positive links
-1. One or more false positive links.
+* **Units:** clusters (of three or more records)
+* **Features:** the graph measures from the outputs of a record linkage process
+* **Outcomes:**
+    0. No false positive links
+    0. One or more false positive links
 
-## Data {.smaller}
 
-* Wikidata comprised data belonging to individuals 
-* Date of death between the years 1953 and 2000 (inclusive). 
+## Underlying Data
 
-* Given name
-* Family name
-* Date of birth (day component)
-* Date of birth (month component)
-* Date of birth (year component)
-* Gender
+Wikidata: Information on individuals appearing in Wikipedia
 
-* 311,915
-* 5 fields
+* Date of death between: 1953 - 2000
+* 5 fields:
+    * Unique entity identifier (assigned by Wikidata)
+    * Given name
+    * Family name
+    * Date of birth 
+    * Gender
+* 311,915 records
 * no missing values
 
+
+## Test Datasets
+
+* 5 test datasets per configuration
+* Probabilistically created using all ~312k records
+
+#### Configurations
+
+:::: {.columns}
+::: {.column width="50%"}
+
+* Duplication of records 
+    * Power law distribution
+    * $\{\underline{49}, 99\}$ maximum duplicates
+:::
+
+::: {.column width="50%"}
+* Record corruption:
+    * <u>Base case</u>
+    * $\{0.5, 2, 5\} \times$ base case corruption 
+:::
+::::
+    
+
+```{r}
+#| output: asis
+
+field_list <- data.frame(field = c("given name",
+                                   "family name",
+                                   "date of birth",
+                                   "gender"),
+                         mechanism = c("QWERTY typographical error",
+                                       "QWERTY typographical error",
+                                       "Number pad typographical error",
+                                       "Swapped"),
+                         base_probability = c(5.0,
+                                              5.0,
+                                              1.0,
+                                              0.5)
+)
+
+knitr::kable(field_list,
+             align = "l",
+             format = "html",
+             col.names = c("attribute",
+                           "corruption mechanism",
+                           "Base case probability of corruption (%)"),
+             booktabs = TRUE) |>
+  kableExtra::kable_styling(bootstrap_options = "striped")
+
+```
+
+
+## Analysis datasets generation
+
+* Record linkage (de-duplication) and clustering on each test dataset
+    * Linkage threshold chosen to give highest F-measure
+* Excluded clusters with:
+    * fewer than 3 records
+    * more than 50/100 records
+* 0.7% - 1.5% clusters had one or more false positive link
+* Calculated graph measures
+
+
+## Processing summary
+
+```{dot}
+//| fig-width: 16
+
+digraph G {
+rankdir=LR
+  { 
+    node [shape=parallelogram fillcolor=lightyellow style=filled]
+    data [label="underlying data"]
+    test [label="test datasets \nx configurations \nx 5"]
+    analysis [label="analysis datasets \nx configurations \nx 5"]
+    eval [label="results"]
+  }
+  { 
+    node [shape=rect fillcolor=lightblue style=filled]
+    corrupt [label="Duplicate and corrupt \nx configurations \nx 5"]
+    link [label="De-duplicate and cluster \nx configurations \nx 5"]
+    measure [label="Calculate graph measures \nx configurations \nx 5"]
+    classify [label="Classifier \n(train/evaluate)\n"]
+  }
+  data -> corrupt
+  corrupt -> test
+  test -> link 
+  link -> analysis
+  analysis -> measure
+  measure -> classify
+  classify -> classify [label="Train: base case only"]
+  classify -> eval
+}
+
+```
+
+
+## Example clusters (graphs)
+
+::: {layout-ncol=2 layout-valign="bottom"}
+
+![A cluster of 1 entity](figures/cluster_example2.svg){width=80%}
+
+![A "problematic" cluster of 2 entities](figures/cluster_example.svg){width=80%}
+
+:::
+
+
+## Internal cross-validation
+
+```{r}
+
+ggplot(internal_cv_summaries[measure != "accuracy"], aes(x = measure,
+                                  y = mean_value,
+                                  colour = predictor_set, 
+                                  group = predictor_set)) +
+  geom_point(size = 2, 
+             position=position_dodge(.5)) + 
+  geom_pointrange(aes(ymin = pmax(mean_value - sd_value, 0), 
+                      ymax = pmin(mean_value + sd_value, 1)),
+                  position = position_dodge(.5)) +
+  coord_cartesian(ylim = c(0,1)) +
+  guides(colour = guide_legend(title="Graph conceptualisation\n(available features):",
+                               position = "bottom")) +
+  scale_color_manual(values = colour_scale_values) +
+                       labs(x = NULL,
+                            y = NULL) +
+                       theme_bw() +
+                       geom_point(data = naive_class_perf[measure != "accuracy"],
+                                  aes(x = measure,
+                                      y = naive_classifier_prob), 
+                                  shape = 8,
+                                  size = 3,
+                                  colour="black")
+
+```
+
+
+## Quasi-external validation
+
+```{r}
+
+ggplot(external_cv_summaries[measure != "accuracy"], aes(x = measure,
+                       y = mean_value,
+                       colour = predictor_set, 
+                       group = predictor_set)) +
+  geom_point(size = 2, 
+                position=position_dodge(.5)) + 
+  geom_pointrange(aes(ymin = pmax(mean_value - sd_value, 0), 
+                      ymax = pmin(mean_value + sd_value, 1)),
+                position = position_dodge(.5)) +
+  coord_cartesian(ylim = c(0,1)) +
+  guides(colour = guide_legend(title="Graph conceptualisation\n(available features):",
+                               position = "bottom")) +
+  scale_color_manual(values = colour_scale_values) +
+  scale_y_continuous(sec.axis = sec_axis(~., 
+                                         name = "Corruption probability multiplier",
+                                         breaks = NULL,
+                                         labels = NULL,
+                                         guide = NULL)) +
+  facet_grid(cols = vars(max_duplicates),
+             rows = vars(corruption_multiplier)) +
+  labs(y = NULL,
+       x = NULL) +
+  theme_bw() +
+  geom_point(data = pred_imbalance_ratio[measure != "accuracy"],
+               aes(x = measure,
+                   y = naive_classifier_prob), 
+             shape = 8,
+             size = 2,
+             colour="black")
+
+```
+
+
+## Feature importance
+
+```{r}
+
+ggplot(models_rel_imp, aes(x = feature,
+                           y = gain,
+                           fill  = predictor_set,
+                           group = predictor_set)) +
+  geom_bar(stat = "identity",
+           position = position_dodge2(width = 0.9, preserve = "single")) +
+  theme_bw() +
+  guides(fill = guide_legend(title="Graph conceptualisation\n(available features):",
+                               position = "bottom")) +
+  scale_fill_manual(values = colour_scale_values) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  labs(x = NULL,
+       y = NULL)
+
+```
+
+## TL; DL
+
+### Graph measure based classifiers appear...
+
+* Promising
+* Insensitive to number of duplications
+
+But:
+
+* Require training data
+* Sensitive to data corruption rates
+
+**Ample room for further research...**
+
+* Especially, contribution to match score from individual attributes
