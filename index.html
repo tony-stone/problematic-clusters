@@ -31,6 +31,7 @@
     }
   </style>
   <link rel="stylesheet" href="problematic-clusters_files/libs/revealjs/dist/theme/quarto.css">
+  <link rel="stylesheet" href="style.css">
   <link href="problematic-clusters_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="problematic-clusters_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="problematic-clusters_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -320,6 +321,8 @@
       margin-right: 0; 
     }
   </style>
+  <script src="problematic-clusters_files/libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="problematic-clusters_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -340,25 +343,26 @@ Tony Stone
 </section>
 <section id="context" class="slide level2">
 <h2>Context</h2>
-<ul>
-<li><p>Manual review of record linkage outputs is resource intensive</p></li>
-<li><p>Aim: Reduce manual review by automated identification of false links / missed links</p></li>
-</ul>
-</section>
-<section id="entity-resolution" class="slide level2">
-<h2>Entity resolution</h2>
+<h4 id="record-linkage">Record linkage</h4>
 <blockquote>
 <p>The process of identifying records belonging to the same individual (or entity) from a set or sets of textual records.</p>
 </blockquote>
 <ul>
-<li><p>Also known as de-duplication</p></li>
-<li><p>Considerably harder than 1-to-1 linkage</p></li>
+<li><p>Also known as entity resolution / de-duplication</p></li>
+<li><p>Often involves <em>manual review</em> to identify false links / missed links</p></li>
+</ul>
+<h4 id="wider-aims">Wider aims</h4>
+<ul>
+<li>Desire to reduce (resource intensive) manual review:
+<ul>
+<li>automate identification of <strong>false links</strong> / <del>missed links</del></li>
+</ul></li>
 </ul>
 </section>
-<section id="definitions-for-this-presentation-12" class="slide level2 smaller">
+<section id="definitions-for-this-presentation-12" class="slide level2">
 <h2>Definitions for this presentation (1/2)</h2>
 <ul>
-<li><p><strong>record linkage:</strong> probabilistic pairwise-comparison linkage approach (Fellegi-Sunter) followed by <em>transitive closure</em> to produce disjoint <em>clusters</em>.</p></li>
+<li><p><strong>record linkage:</strong> pairwise comparison of records <span class="math inline">\(\rightarrow\)</span> <em>transitive closure</em> <span class="math inline">\(\rightarrow\)</span> <em>clusters</em></p></li>
 <li><p><strong>transitive closure:</strong></p></li>
 </ul>
 <div class="cell" data-fig-height="2" data-layout-align="default">
@@ -412,14 +416,14 @@ Tony Stone
 </div>
 </div>
 <ul>
-<li><strong>cluster:</strong> a set of records connected (possibly via <em>transitive closure</em>) through one or more pairwise comparisons, each with <em>match score</em> exceeding a chosen (linkage) threshold. (And not connected to any record outside the set.)</li>
+<li><strong>cluster:</strong> set of records connected by comparisons yielding <em>match score</em> above a linkage threshold.</li>
 </ul>
 </section>
-<section id="definitions-for-this-presentation-22" class="slide level2 smaller">
+<section id="definitions-for-this-presentation-22" class="slide level2">
 <h2>Definitions for this presentation (2/2)</h2>
 <ul>
-<li><p><strong>“problematic cluster”:</strong> a cluster with one or more false positive</p></li>
-<li><p><strong>match score:</strong> The ratio of the products of conditional probabilities of each compared attribute in two records being un/equal, given the records are a true match (<span class="math inline">\(M\)</span>) over true non-matches (<span class="math inline">\(U\)</span>).</p></li>
+<li><p><strong>“problematic” cluster:</strong> a cluster with one or more false positive links</p></li>
+<li><p><strong>match score:</strong> Ratio of products of conditional probabilities of observing in/equality of an attribute in two records given true matches (<span class="math inline">\(M\)</span>) over true non-matches (<span class="math inline">\(U\)</span>).</p></li>
 </ul>
 <p><span class="math display">\[ R_i = \frac{P(\gamma_i \mid M)}{P(\gamma_i \mid U)} =
   \frac{\prod_j P(\gamma_{ij} \mid M)}{\prod_j P(\gamma_{ij} \mid U)}
@@ -428,33 +432,72 @@ Tony Stone
 </section>
 <section id="graph-representation-of-pairwise-record-linkage-outputs" class="slide level2">
 <h2>Graph representation of pairwise record linkage outputs</h2>
-<p>Each cluster can be represented as an:</p>
+<p>Each cluster an undirected simple graph, where:</p>
 <ul>
-<li>undirected simple graph, with:
-<ul>
-<li>each vertex representing a record</li>
-<li>each edge representing a comparison of records</li>
-</ul></li>
+<li>vertices <span class="math inline">\(\leftrightarrow\)</span> records</li>
+<li>edges <span class="math inline">\(\leftrightarrow\)</span> comparison of records</li>
 </ul>
-</section>
-<section id="graph-conceptualisations" class="slide level2 smaller">
-<h2>Graph conceptualisations</h2>
-<ol type="1">
-<li>Single match score threshold: graph only includes edges representing pairwise comparisons that had a match score greater than the threshold.</li>
-<li>Include match scores (suitably transformed [0,1]) as a weight for each edge.</li>
-<li>In addition to overall match score, include the contribution (suitably transformed [0,1]) of each compared attribute to the overall match score as a vector edge weights.</li>
-</ol>
-<div class="columns">
-<div class="column" style="width:30%;">
-<div class="cell" data-fig-height="2" data-fig-width="2" data-layout-align="default">
+<div class="cell" data-fig-height="5" data-fig-width="7" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<svg width="192" height="192" viewbox="0.00 0.00 130.13 169.48" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<svg width="672" height="480" viewbox="0.00 0.00 226.03 132.80" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 128.8)">
+<title>G</title>
+<!-- A -->
+<g id="node1" class="node">
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="46.17" cy="-106.8" rx="46.33" ry="18"></ellipse>
+<text text-anchor="middle" x="46.17" y="-102.6" font-family="Times,serif" font-size="14.00">Record 1</text>
+</g>
+<!-- B -->
+<g id="node2" class="node">
+<title>B</title>
+<ellipse fill="none" stroke="black" cx="46.17" cy="-18" rx="46.33" ry="18"></ellipse>
+<text text-anchor="middle" x="46.17" y="-13.8" font-family="Times,serif" font-size="14.00">Record 2</text>
+</g>
+<!-- A&#45;&#45;B -->
+<g id="edge1" class="edge">
+<title>A--B</title>
+<path fill="none" stroke="black" d="M46.17,-88.65C46.17,-73.43 46.17,-51.32 46.17,-36.11"></path>
+<text text-anchor="middle" x="132.1" y="-58.2" font-family="Times,serif" font-size="14.00"> Comparison of Records 1 &amp; 2</text>
+</g>
+</g>
+</svg>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="graph-conceptualisations" class="slide level2">
+<h2>Graph conceptualisations</h2>
+<ol type="1">
+<li>No weighted graph measures</li>
+<li>Weighted graph: match score (above linkage threshold)</li>
+<li>Multiple weighted graphs:
+<ul>
+<li>match score</li>
+<li>each compared attributes’ contribution</li>
+</ul></li>
+</ol>
+<div style="clear: both;">
+
+</div>
+<div class="columns">
+<div class="column orange" style="width:30%;">
+<ol type="1">
+<li></li>
+</ol>
+<div class="cell" data-fig-height="2.5" data-fig-width="3" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<svg width="288" height="240" viewbox="0.00 0.00 130.13 169.48" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 165.48)">
 <title>G1</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-165.48 126.13,-165.48 126.13,4 -4,4"></polygon>
 <!-- A -->
 <g id="node1" class="node">
 <title>A</title>
@@ -490,51 +533,47 @@ Tony Stone
 </div>
 </div>
 </div>
-</div><div class="column" style="width:30%;">
-<div class="cell" data-fig-height="2" data-fig-width="2" data-layout-align="default">
+</div><div class="column green" style="width:30%;">
+<ol start="2" type="1">
+<li></li>
+</ol>
+<div class="cell" data-fig-height="2.5" data-fig-width="3" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<svg width="192" height="192" viewbox="0.00 0.00 134.21 106.41" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102.41)">
+<svg width="288" height="240" viewbox="0.00 0.00 130.13 169.48" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 165.48)">
 <title>G2</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-102.41 130.21,-102.41 130.21,4 -4,4"></polygon>
 <!-- A -->
 <g id="node1" class="node">
 <title>A</title>
-<ellipse fill="none" stroke="black" cx="27" cy="-79.93" rx="27" ry="18"></ellipse>
-<text text-anchor="middle" x="27" y="-75.73" font-family="Times,serif" font-size="14.00">A</text>
+<ellipse fill="none" stroke="black" cx="27" cy="-143.48" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="27" y="-139.28" font-family="Times,serif" font-size="14.00">A</text>
 </g>
 <!-- B -->
 <g id="node2" class="node">
 <title>B</title>
-<ellipse fill="none" stroke="black" cx="99.21" cy="-80.41" rx="27" ry="18"></ellipse>
-<text text-anchor="middle" x="99.21" y="-76.21" font-family="Times,serif" font-size="14.00">B</text>
+<ellipse fill="none" stroke="black" cx="71.02" cy="-86.15" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="71.02" y="-81.95" font-family="Times,serif" font-size="14.00">B</text>
 </g>
 <!-- A&#45;&#45;B -->
 <g id="edge1" class="edge">
 <title>A--B</title>
-<path fill="none" stroke="black" d="M54.3,-80.11C60.05,-80.15 66.12,-80.19 71.87,-80.23"></path>
-<text text-anchor="middle" x="63.08" y="-67.57" font-family="Times,serif" font-size="14.00">0.5</text>
+<path fill="none" stroke="black" d="M39.5,-127.2C45.5,-119.39 52.66,-110.06 58.64,-102.27"></path>
+<text text-anchor="middle" x="57.82" y="-118.94" font-family="Times,serif" font-size="14.00">0.5</text>
 </g>
 <!-- C -->
 <g id="node3" class="node">
 <title>C</title>
-<ellipse fill="none" stroke="black" cx="63.59" cy="-18" rx="27" ry="18"></ellipse>
-<text text-anchor="middle" x="63.59" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
-</g>
-<!-- A&#45;&#45;C -->
-<g id="edge3" class="edge">
-<title>A--C</title>
-<path fill="none" stroke="black" d="M37,-63.01C42.16,-54.27 48.44,-43.64 53.61,-34.9"></path>
-<text text-anchor="middle" x="36.55" y="-36.36" font-family="Times,serif" font-size="14.00">0.3</text>
+<ellipse fill="none" stroke="black" cx="95.13" cy="-18" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="95.13" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
 </g>
 <!-- B&#45;&#45;C -->
 <g id="edge2" class="edge">
 <title>B--C</title>
-<path fill="none" stroke="black" d="M89.47,-63.35C84.45,-54.55 78.34,-43.84 73.31,-35.03"></path>
-<text text-anchor="middle" x="90.14" y="-36.59" font-family="Times,serif" font-size="14.00">0.9</text>
+<path fill="none" stroke="black" d="M77.23,-68.6C80.8,-58.51 85.27,-45.86 88.85,-35.73"></path>
+<text text-anchor="middle" x="74.29" y="-56.37" font-family="Times,serif" font-size="14.00">0.9</text>
 </g>
 </g>
 </svg>
@@ -543,51 +582,47 @@ Tony Stone
 </div>
 </div>
 </div>
-</div><div class="column" style="width:30%;">
-<div class="cell" data-fig-height="2" data-fig-width="2" data-layout-align="default">
+</div><div class="column purple" style="width:30%;">
+<ol start="3" type="1">
+<li></li>
+</ol>
+<div class="cell" data-fig-height="2.5" data-fig-width="3" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<svg width="192" height="192" viewbox="0.00 0.00 195.74 106.41" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102.41)">
+<svg width="288" height="240" viewbox="0.00 0.00 132.90 169.48" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 165.48)">
 <title>G3</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-102.41 191.74,-102.41 191.74,4 -4,4"></polygon>
 <!-- A -->
 <g id="node1" class="node">
 <title>A</title>
-<ellipse fill="none" stroke="black" cx="57.52" cy="-79.93" rx="27" ry="18"></ellipse>
-<text text-anchor="middle" x="57.52" y="-75.73" font-family="Times,serif" font-size="14.00">A</text>
+<ellipse fill="none" stroke="black" cx="27" cy="-143.48" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="27" y="-139.28" font-family="Times,serif" font-size="14.00">A</text>
 </g>
 <!-- B -->
 <g id="node2" class="node">
 <title>B</title>
-<ellipse fill="none" stroke="black" cx="129.73" cy="-80.41" rx="27" ry="18"></ellipse>
-<text text-anchor="middle" x="129.73" y="-76.21" font-family="Times,serif" font-size="14.00">B</text>
+<ellipse fill="none" stroke="black" cx="71.02" cy="-86.15" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="71.02" y="-81.95" font-family="Times,serif" font-size="14.00">B</text>
 </g>
 <!-- A&#45;&#45;B -->
 <g id="edge1" class="edge">
 <title>A--B</title>
-<path fill="none" stroke="black" d="M84.82,-80.11C90.57,-80.15 96.64,-80.19 102.39,-80.23"></path>
-<text text-anchor="middle" x="55.69" y="-84.37" font-family="Times,serif" font-size="14.00">(0.5, 0.6, 0.8)</text>
+<path fill="none" stroke="black" d="M39.5,-127.2C45.5,-119.39 52.66,-110.06 58.64,-102.27"></path>
+<text text-anchor="middle" x="86.98" y="-118.94" font-family="Times,serif" font-size="14.00">(0.5, 0.6, 0.4)</text>
 </g>
 <!-- C -->
 <g id="node3" class="node">
 <title>C</title>
-<ellipse fill="none" stroke="black" cx="94.11" cy="-18" rx="27" ry="18"></ellipse>
-<text text-anchor="middle" x="94.11" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
-</g>
-<!-- A&#45;&#45;C -->
-<g id="edge3" class="edge">
-<title>A--C</title>
-<path fill="none" stroke="black" d="M67.52,-63.01C72.68,-54.27 78.97,-43.64 84.13,-34.9"></path>
-<text text-anchor="middle" x="37.91" y="-36.36" font-family="Times,serif" font-size="14.00">(0.1, 0.2, 0.2)</text>
+<ellipse fill="none" stroke="black" cx="95.13" cy="-18" rx="27" ry="18"></ellipse>
+<text text-anchor="middle" x="95.13" y="-13.8" font-family="Times,serif" font-size="14.00">C</text>
 </g>
 <!-- B&#45;&#45;C -->
 <g id="edge2" class="edge">
 <title>B--C</title>
-<path fill="none" stroke="black" d="M120,-63.35C114.97,-54.55 108.86,-43.84 103.83,-35.03"></path>
-<text text-anchor="middle" x="149.83" y="-36.59" font-family="Times,serif" font-size="14.00">(0.2, 0.3, 0.4)</text>
+<path fill="none" stroke="black" d="M77.23,-68.6C80.8,-58.51 85.27,-45.86 88.85,-35.73"></path>
+<text text-anchor="middle" x="45.13" y="-56.37" font-family="Times,serif" font-size="14.00">(0.9, 0.9, 0.8)</text>
 </g>
 </g>
 </svg>
@@ -601,36 +636,296 @@ Tony Stone
 <section id="graphs-measures-investigated" class="slide level2">
 <h2>Graphs measures investigated</h2>
 <ul>
-<li>Diameter: an indication of the connectedness of vertices in a graph Global Clustering Coefficient</li>
-<li>Global clustering coefficient: a measure of the clustering of the vertices</li>
-<li>Averaged Local Clustering Coefficient: another measure of clustering of the vertices</li>
-<li>Assortativity (degree): can be interpreted as a measure summarising how vertices in a graph mix together</li>
-<li>Density: the connectedness of vertices in a graph</li>
+<li><strong>5 measures:</strong> Diameter; Global clustering coefficient; Averaged Local Clustering Coefficient; Assortativity (degree); Density</li>
+<li><strong>Measures of vertex:</strong> connectedness, clustering, mixing</li>
+<li>Weights only used for <strong>diameter</strong></li>
 </ul>
 </section>
-<section id="a-classification-problem" class="slide level2">
-<h2>A classification problem</h2>
-<p>Can a widely-applicable classifier be created to identify false positive links using only graph measures derived from the outputs of a record linkage process.</p>
-<p>In essence, this is a binary classification problem in which the individual units are the clusters (of three or more records), with features comprised of various graph measures, and we wish to classify each unit as having either:</p>
-<ol type="1">
-<li>No false positive links</li>
-<li>One or more false positive links.</li>
-</ol>
-</section>
-<section id="data" class="slide level2 smaller">
-<h2>Data</h2>
+<section id="a-binary-classification-problem" class="slide level2">
+<h2>A binary classification problem</h2>
+<p>Identify clusters with false positive links</p>
 <ul>
-<li><p>Wikidata comprised data belonging to individuals</p></li>
-<li><p>Date of death between the years 1953 and 2000 (inclusive).</p></li>
-<li><p>Given name</p></li>
-<li><p>Family name</p></li>
-<li><p>Date of birth (day component)</p></li>
-<li><p>Date of birth (month component)</p></li>
-<li><p>Date of birth (year component)</p></li>
-<li><p>Gender</p></li>
-<li><p>311,915</p></li>
-<li><p>5 fields</p></li>
-<li><p>no missing values</p></li>
+<li><strong>Units:</strong> clusters (of three or more records)</li>
+<li><strong>Features:</strong> the graph measures from the outputs of a record linkage process</li>
+<li><strong>Outcomes:</strong>
+<ol start="0" type="1">
+<li>No false positive links</li>
+<li>One or more false positive links</li>
+</ol></li>
+</ul>
+</section>
+<section id="underlying-data" class="slide level2">
+<h2>Underlying Data</h2>
+<p>Wikidata: Information on individuals appearing in Wikipedia</p>
+<ul>
+<li>Date of death between: 1953 - 2000</li>
+<li>5 fields:
+<ul>
+<li>Unique entity identifier (assigned by Wikidata)</li>
+<li>Given name</li>
+<li>Family name</li>
+<li>Date of birth</li>
+<li>Gender</li>
+</ul></li>
+<li>311,915 records</li>
+<li>no missing values</li>
+</ul>
+</section>
+<section id="test-datasets" class="slide level2">
+<h2>Test Datasets</h2>
+<ul>
+<li>5 test datasets per configuration</li>
+<li>Probabilistically created using all ~312k records</li>
+</ul>
+<h4 id="configurations">Configurations</h4>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Duplication of records
+<ul>
+<li>Power law distribution</li>
+<li><span class="math inline">\(\{\underline{49}, 99\}\)</span> maximum duplicates</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>Record corruption:
+<ul>
+<li><u>Base case</u></li>
+<li><span class="math inline">\(\{0.5, 2, 5\} \times\)</span> base case corruption</li>
+</ul></li>
+</ul>
+</div></div>
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">attribute</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">corruption mechanism</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Base case probability of corruption (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">given name</td>
+<td style="text-align: left;">QWERTY typographical error</td>
+<td style="text-align: left;">5.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">family name</td>
+<td style="text-align: left;">QWERTY typographical error</td>
+<td style="text-align: left;">5.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">date of birth</td>
+<td style="text-align: left;">Number pad typographical error</td>
+<td style="text-align: left;">1.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gender</td>
+<td style="text-align: left;">Swapped</td>
+<td style="text-align: left;">0.5</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+<section id="analysis-datasets-generation" class="slide level2">
+<h2>Analysis datasets generation</h2>
+<ul>
+<li>Record linkage (de-duplication) and clustering on each test dataset
+<ul>
+<li>Linkage threshold chosen to give highest F-measure</li>
+</ul></li>
+<li>Excluded clusters with:
+<ul>
+<li>fewer than 3 records</li>
+<li>more than 50/100 records</li>
+</ul></li>
+<li>0.7% - 1.5% clusters had one or more false positive link</li>
+<li>Calculated graph measures</li>
+</ul>
+</section>
+<section id="processing-summary" class="slide level2">
+<h2>Processing summary</h2>
+<div class="cell" data-fig-width="16" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<svg width="1536" height="480" viewbox="0.00 0.00 1608.31 124.80" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none; display: block; margin: auto auto auto auto">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 120.8)">
+<title>G</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-120.8 1604.31,-120.8 1604.31,4 -4,4"></polygon>
+<!-- data -->
+<g id="node1" class="node">
+<title>data</title>
+<polygon fill="lightyellow" stroke="black" points="209.44,-76.4 42.74,-76.4 -0.15,-40.4 166.56,-40.4 209.44,-76.4"></polygon>
+<text text-anchor="middle" x="104.65" y="-54.2" font-family="Times,serif" font-size="14.00">underlying data</text>
+</g>
+<!-- corrupt -->
+<g id="node5" class="node">
+<title>corrupt</title>
+<polygon fill="lightblue" stroke="black" points="387.64,-87.8 246.51,-87.8 246.51,-29 387.64,-29 387.64,-87.8"></polygon>
+<text text-anchor="middle" x="317.08" y="-71" font-family="Times,serif" font-size="14.00">Duplicate and corrupt </text>
+<text text-anchor="middle" x="317.08" y="-54.2" font-family="Times,serif" font-size="14.00">x configurations </text>
+<text text-anchor="middle" x="317.08" y="-37.4" font-family="Times,serif" font-size="14.00">x 5</text>
+</g>
+<!-- data&#45;&gt;corrupt -->
+<g id="edge1" class="edge">
+<title>data-&gt;corrupt</title>
+<path fill="none" stroke="black" d="M188.21,-58.4C203.98,-58.4 220.47,-58.4 236.16,-58.4"></path>
+<polygon fill="black" stroke="black" points="236.34,-61.9 246.34,-58.4 236.34,-54.9 236.34,-61.9"></polygon>
+</g>
+<!-- test -->
+<g id="node2" class="node">
+<title>test</title>
+<polygon fill="lightyellow" stroke="black" points="654.69,-116.7 471.93,-116.7 424.91,-0.1 607.67,-0.1 654.69,-116.7"></polygon>
+<text text-anchor="middle" x="539.8" y="-71" font-family="Times,serif" font-size="14.00">test datasets </text>
+<text text-anchor="middle" x="539.8" y="-54.2" font-family="Times,serif" font-size="14.00">x configurations </text>
+<text text-anchor="middle" x="539.8" y="-37.4" font-family="Times,serif" font-size="14.00">x 5</text>
+</g>
+<!-- link -->
+<g id="node6" class="node">
+<title>link</title>
+<polygon fill="lightblue" stroke="black" points="848.24,-87.8 691.58,-87.8 691.58,-29 848.24,-29 848.24,-87.8"></polygon>
+<text text-anchor="middle" x="769.91" y="-71" font-family="Times,serif" font-size="14.00">De-duplicate and cluster </text>
+<text text-anchor="middle" x="769.91" y="-54.2" font-family="Times,serif" font-size="14.00">x configurations </text>
+<text text-anchor="middle" x="769.91" y="-37.4" font-family="Times,serif" font-size="14.00">x 5</text>
+</g>
+<!-- test&#45;&gt;link -->
+<g id="edge3" class="edge">
+<title>test-&gt;link</title>
+<path fill="none" stroke="black" d="M631.28,-58.4C647.76,-58.4 664.93,-58.4 681.33,-58.4"></path>
+<polygon fill="black" stroke="black" points="681.42,-61.9 691.42,-58.4 681.42,-54.9 681.42,-61.9"></polygon>
+</g>
+<!-- analysis -->
+<g id="node3" class="node">
+<title>analysis</title>
+<polygon fill="lightyellow" stroke="black" points="1118.23,-116.7 932.74,-116.7 885.02,-0.1 1070.51,-0.1 1118.23,-116.7"></polygon>
+<text text-anchor="middle" x="1001.63" y="-71" font-family="Times,serif" font-size="14.00">analysis datasets </text>
+<text text-anchor="middle" x="1001.63" y="-54.2" font-family="Times,serif" font-size="14.00">x configurations </text>
+<text text-anchor="middle" x="1001.63" y="-37.4" font-family="Times,serif" font-size="14.00">x 5</text>
+</g>
+<!-- measure -->
+<g id="node7" class="node">
+<title>measure</title>
+<polygon fill="lightblue" stroke="black" points="1318.67,-87.8 1155.01,-87.8 1155.01,-29 1318.67,-29 1318.67,-87.8"></polygon>
+<text text-anchor="middle" x="1236.84" y="-71" font-family="Times,serif" font-size="14.00">Calculate graph measures </text>
+<text text-anchor="middle" x="1236.84" y="-54.2" font-family="Times,serif" font-size="14.00">x configurations </text>
+<text text-anchor="middle" x="1236.84" y="-37.4" font-family="Times,serif" font-size="14.00">x 5</text>
+</g>
+<!-- analysis&#45;&gt;measure -->
+<g id="edge5" class="edge">
+<title>analysis-&gt;measure</title>
+<path fill="none" stroke="black" d="M1094.46,-58.4C1111.04,-58.4 1128.31,-58.4 1144.86,-58.4"></path>
+<polygon fill="black" stroke="black" points="1145.05,-61.9 1155.05,-58.4 1145.05,-54.9 1145.05,-61.9"></polygon>
+</g>
+<!-- eval -->
+<g id="node4" class="node">
+<title>eval</title>
+<polygon fill="lightyellow" stroke="black" points="1600.46,-76.4 1515.67,-76.4 1493.86,-40.4 1578.65,-40.4 1600.46,-76.4"></polygon>
+<text text-anchor="middle" x="1547.16" y="-54.2" font-family="Times,serif" font-size="14.00">results</text>
+</g>
+<!-- corrupt&#45;&gt;test -->
+<g id="edge2" class="edge">
+<title>corrupt-&gt;test</title>
+<path fill="none" stroke="black" d="M387.91,-58.4C403.81,-58.4 421.01,-58.4 437.92,-58.4"></path>
+<polygon fill="black" stroke="black" points="438.39,-61.9 448.39,-58.4 438.39,-54.9 438.39,-61.9"></polygon>
+</g>
+<!-- link&#45;&gt;analysis -->
+<g id="edge4" class="edge">
+<title>link-&gt;analysis</title>
+<path fill="none" stroke="black" d="M848.36,-58.4C864.43,-58.4 881.6,-58.4 898.4,-58.4"></path>
+<polygon fill="black" stroke="black" points="898.81,-61.9 908.81,-58.4 898.81,-54.9 898.81,-61.9"></polygon>
+</g>
+<!-- classify -->
+<g id="node8" class="node">
+<title>classify</title>
+<polygon fill="lightblue" stroke="black" points="1456.76,-79 1355.75,-79 1355.75,-37.8 1456.76,-37.8 1456.76,-79"></polygon>
+<text text-anchor="middle" x="1406.26" y="-62.6" font-family="Times,serif" font-size="14.00">Classifier </text>
+<text text-anchor="middle" x="1406.26" y="-45.8" font-family="Times,serif" font-size="14.00">(train/evaluate)</text>
+</g>
+<!-- measure&#45;&gt;classify -->
+<g id="edge6" class="edge">
+<title>measure-&gt;classify</title>
+<path fill="none" stroke="black" d="M1318.61,-58.4C1327.62,-58.4 1336.68,-58.4 1345.37,-58.4"></path>
+<polygon fill="black" stroke="black" points="1345.37,-61.9 1355.37,-58.4 1345.37,-54.9 1345.37,-61.9"></polygon>
+</g>
+<!-- classify&#45;&gt;eval -->
+<g id="edge8" class="edge">
+<title>classify-&gt;eval</title>
+<path fill="none" stroke="black" d="M1457.01,-58.4C1469.18,-58.4 1482.22,-58.4 1494.47,-58.4"></path>
+<polygon fill="black" stroke="black" points="1494.54,-61.9 1504.54,-58.4 1494.54,-54.9 1494.54,-61.9"></polygon>
+</g>
+<!-- classify&#45;&gt;classify -->
+<g id="edge7" class="edge">
+<title>classify-&gt;classify</title>
+<path fill="none" stroke="black" d="M1393.76,-79.16C1392.4,-88.79 1396.56,-97.2 1406.26,-97.2 1412.17,-97.2 1416.02,-94.08 1417.82,-89.46"></path>
+<polygon fill="black" stroke="black" points="1421.34,-89.43 1418.76,-79.16 1414.37,-88.8 1421.34,-89.43"></polygon>
+<text text-anchor="middle" x="1406.26" y="-101.4" font-family="Times,serif" font-size="14.00">Train: base case only</text>
+</g>
+</g>
+</svg>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="example-clusters-graphs" class="slide level2">
+<h2>Example clusters (graphs)</h2>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-bottom">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="figures/cluster_example2.svg" style="width:80.0%"></p>
+<figcaption>A cluster of 1 entity</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="figures/cluster_example.svg" style="width:80.0%"></p>
+<figcaption>A “problematic” cluster of 2 entities</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="internal-cross-validation" class="slide level2">
+<h2>Internal cross-validation</h2>
+
+<img data-src="problematic-clusters_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<section id="quasi-external-validation" class="slide level2">
+<h2>Quasi-external validation</h2>
+
+<img data-src="problematic-clusters_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"></section>
+<section id="feature-importance" class="slide level2">
+<h2>Feature importance</h2>
+
+<img data-src="problematic-clusters_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
+<section id="tl-dl" class="slide level2">
+<h2>TL; DL</h2>
+<h3 id="graph-measure-based-classifiers-appear">Graph measure based classifiers appear…</h3>
+<ul>
+<li>Promising</li>
+<li>Insensitive to number of duplications</li>
+</ul>
+<p>But:</p>
+<ul>
+<li>Require training data</li>
+<li>Sensitive to data corruption rates</li>
+</ul>
+<p><strong>Ample room for further research…</strong></p>
+<ul>
+<li>Especially, contribution to match score from individual attributes</li>
 </ul>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
@@ -814,9 +1109,9 @@ Tony Stone
         // The "normal" size of the presentation, aspect ratio will be preserved
         // when the presentation is scaled to fit different resolutions. Can be
         // specified using percentage units.
-        width: 1050,
+        width: 1600,
 
-        height: 700,
+        height: 900,
 
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
@@ -848,6 +1143,44 @@ Tony Stone
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

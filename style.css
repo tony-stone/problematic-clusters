@@ -1,0 +1,15 @@
+.green {
+  background: rgba(27,158,119,.2); /* #1b9e77 */
+}
+
+.orange {
+  background: rgba(217,95,2,.2); /* #d95f02 */
+}
+
+.purple {
+  background: rgba(117,112,179,.2); /* #7570b3 */
+}
+
+figcaption {
+  text-align: center;
+}
