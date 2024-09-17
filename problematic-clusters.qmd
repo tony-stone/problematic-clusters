@@ -1,6 +1,6 @@
 ---
 title: "Identifying \"problematic\" record linkage clusters using graph measures"
-author: "Tony Stone"
+author: "Tony Stone, University College London / University of Sheffield"
 date: 2024-09-05
 date-format: "D MMM YYYY"
 css: style.css
